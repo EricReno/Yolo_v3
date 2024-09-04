@@ -45,7 +45,7 @@ class YOLO(nn.Module):
         self.neck = build_neck(neck, feat_dims[-1])
 
         # 特征金字塔
-        self.fpn, feat_dims = build_fpn(backbone, fpn, feat_dims)
+        self.fpn, feat_dims = build_fpn(fpn, feat_dims)
 
         self.heads = nn.ModuleList(
             [Decouple(dim) for dim in feat_dims]

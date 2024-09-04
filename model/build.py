@@ -1,7 +1,7 @@
 import os
 import torch
-from yolo import YOLO
 import torch.nn as nn
+from .yolo import YOLO
 
 def build_yolo(args, device, trainable):
     model = YOLO(device = device,
@@ -50,29 +50,10 @@ def build_yolo(args, device, trainable):
         # checkpoint state dict
         try:
             checkpoint_state_dict = checkpoint.pop("model")
-            print('Load model from the checkpoint: ', args.resume)
+            print('Load model from the checkpoint: ', ckpt_path)
             model.load_state_dict(checkpoint_state_dict)
             del checkpoint, checkpoint_state_dict
         except:
             print("No model in the given checkpoint.")
 
-    if resume and resume != 'None':
-        checkpoint = torch.load(os.path.join('log', resume))
-        # checkpoint state dict
-        try:
-            checkpoint_state_dict = checkpoint.pop("optimizer")
-            print('Load optimizer from the checkpoint: ', resume)
-            optimizer.load_state_dict(checkpoint_state_dict)
-            start_epoch = checkpoint.pop("epoch") + 1
-            del checkpoint, checkpoint_state_dict
-        except:
-            print("No optimzier in the given checkpoint.")
-
-
-        checkpoint = torch.load(ckt_pth, map_location='cpu', weights_only=False)
-        max_mAP = checkpoint['mAP']
-        start_epoch = checkpoint['epoch'] + 1         
-        model.load_state_dict(checkpoint["model"])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-    
     return model

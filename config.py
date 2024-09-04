@@ -9,7 +9,7 @@ def parse_args():
                         help='Enable CUDA for GPU acceleration.')   
 
     parser.add_argument('--num_workers',  
-                        default=4,
+                        default=16,
                         type=int,
                         help='Number of CPU threads to use during data loading.')             
     
@@ -79,7 +79,7 @@ def parse_args():
 
     # Training settings
     parser.add_argument('--batch_size',
-                        default=4,
+                        default=64,
                         type=int,
                         help='Batch size used during training (per GPU).')
     
@@ -108,7 +108,16 @@ def parse_args():
                         type=int,
                         help='Epoch interval to save model checkpoints.')
     
-    # Learning rate settings
+    # Optimizer settings
+    parser.add_argument('--optimizer',             
+                        default='sgd',
+                        type=str,
+                        help='Base learning rate.')
+    
+    parser.add_argument('--grad_accumulate', 
+                        default=1, type=int,
+                        help='gradient accumulation')
+    
     parser.add_argument('--learning_rate',             
                         default=0.01,
                         type=float,

@@ -5,13 +5,17 @@ import numpy
 from eval import Evaluator
 from model.build import build_yolo
 from config import parse_args
-from metric.flops import flops
-from utils.optimizer import build_optimizer
-from metric.criterion import Loss
 from dataset.voc import VOCDataset
 from dataset.utils import CollateFunc
 from dataset.augment import Augmentation
 from torch.utils.tensorboard import SummaryWriter
+
+from utils.flops import flops
+from utils.criterion import Loss
+from utils.optimizer import build_optimizer
+
+
+
 
 def train():
     parser, args = parse_args()
@@ -67,16 +71,10 @@ def train():
         recall_thre = args.recall_threshold,
         visualization = args.eval_visualization)
     
-    grad_accumulate = max(1, round(64 / args.batch_size))
-    learning_rate = (grad_accumulate*args.batch_size/64)*args.learning_rate
+    optimizer, start_epoch = build_optimizer(args, model)
     
-    start_epoch = 0
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
-    # build_optimizer(1, model, args.resume_weight_path)
-    
-    
-    max_mAP = 0
     # ----------------------- Build Train ----------------------------------------
+    max_mAP = 0
     start = time.time()
     for epoch in range(start_epoch, args.epochs_total):
         model.train()
@@ -84,11 +82,13 @@ def train():
         model.trainable = True
         for iteration, (images, targets) in enumerate(train_dataloader):
             ## learning rate
-            ni = iteration + epoch * args.batch_size
+            ni = iteration + epoch * len(train_dataloader)
             if epoch < args.warmup_epochs:
-                optimizer.param_groups[0]['lr'] = numpy.interp(epoch*len(train_dataloader)+iteration,
-                                                               [0, args.warmup_epochs*len(train_dataloader)],
-                                                               [args.warmup_learning_rate, learning_rate])
+                for j, x in enumerate(optimizer.param_groups):
+                    x['lr'] = numpy.interp(epoch*len(train_dataloader)+iteration,
+                                           [0, args.warmup_epochs*len(train_dataloader)],
+                                           [0.1 if j ==0 else 0.0,
+                                            x['initial_lr']])
             elif epoch >= args.second_stage_epochs:
                 optimizer.param_groups[0]['lr'] = args.second_stage_lr
             elif epoch >= args.third_stage_epochs:
@@ -101,15 +101,15 @@ def train():
             ## loss
             loss_dict = criterion(outputs=outputs, targets=targets)
             [loss_obj, loss_cls, loss_box, losses] = loss_dict.values()
-            if grad_accumulate > 1:
-               losses /= grad_accumulate
-               loss_obj /= grad_accumulate
-               loss_cls /= grad_accumulate
-               loss_box /= grad_accumulate
+            if args.grad_accumulate > 1:
+               losses /= args.grad_accumulate
+               loss_obj /= args.grad_accumulate
+               loss_cls /= args.grad_accumulate
+               loss_box /= args.grad_accumulate
             losses.backward()
             
             # optimizer.step
-            if ni % grad_accumulate == 0:
+            if ni % args.grad_accumulate == 0:
                 optimizer.step()
                 optimizer.zero_grad()
 

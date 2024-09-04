@@ -1,12 +1,14 @@
 import os
 import torch
 
-def build_optimizer(cfg, model, resume=None):
+def build_optimizer(args, model, resume=None):
+    base_lr = args.learning_rate * args.batch_size * args.grad_accumulate / 64
+
     print('==============================')
-    print('Optimizer: {}'.format(cfg['optimizer']))
-    print('--base lr: {}'.format(cfg['lr0']))
-    print('--momentum: {}'.format(cfg['momentum']))
-    print('--weight_decay: {}'.format(cfg['weight_decay']))
+    print('Optimizer: {}'.format(args.optimizer))
+    print('--base lr: {}'.format(base_lr))
+    print('--momentum: {}'.format(args.momentum))
+    print('--weight_decay: {}'.format(args.weight_decay))
 
     # ------------- Divide model's parameters -------------
     param_dicts = [], [], []
@@ -22,19 +24,17 @@ def build_optimizer(cfg, model, resume=None):
                     param_dicts[2].append(p)  # weight decay for all Non-NormLayers' weight
 
     # Build optimizer
-    if cfg['optimizer'] == 'sgd':
-        optimizer = torch.optim.SGD(param_dicts[0], lr=cfg['lr0'], momentum=cfg['momentum'], weight_decay=0.0)
-    elif cfg['optimizer'] =='adamw':
-        optimizer = torch.optim.AdamW(param_dicts[0], lr=cfg['lr0'], weight_decay=0.0)
+    if args.optimizer == 'sgd':
+        optimizer = torch.optim.SGD(param_dicts[0], lr=base_lr, momentum=args.momentum, weight_decay=0.0)
     else:
-        raise NotImplementedError("Unknown optimizer: {}".format(cfg['optimizer']))
+        raise NotImplementedError("Unknown optimizer: {}".format(args.optimizer))
     
     # Add param groups
     optimizer.add_param_group({"params": param_dicts[1], "weight_decay": 0.0})
-    optimizer.add_param_group({"params": param_dicts[2], "weight_decay": cfg['weight_decay']})
+    optimizer.add_param_group({"params": param_dicts[2], "weight_decay": args.weight_decay})
 
     start_epoch = 0
-    if resume and resume != 'None':
+    if args.resume_weight_path and args.resume_weight_path != 'None':
         checkpoint = torch.load(os.path.join('log', resume))
         # checkpoint state dict
         try:
@@ -46,10 +46,4 @@ def build_optimizer(cfg, model, resume=None):
         except:
             print("No optimzier in the given checkpoint.")
     
-        checkpoint = torch.load(ckt_pth, map_location='cpu', weights_only=False)
-        max_mAP = checkpoint['mAP']
-        start_epoch = checkpoint['epoch'] + 1         
-        model.load_state_dict(checkpoint["model"])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-                                                        
     return optimizer, start_epoch
