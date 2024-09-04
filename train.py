@@ -5,6 +5,7 @@ import numpy
 from eval import Evaluator
 from model.yolo import YOLO
 from config import parse_args
+from metric.flops import flops
 from metric.criterion import Loss
 from dataset.voc import VOCDataset
 from dataset.utils import CollateFunc
@@ -32,9 +33,6 @@ def train():
                              image_set = args.val_dataset,
                              voc_classes = args.class_names,
                              )
-    val_sampler = torch.utils.data.RandomSampler(val_dataset)
-    val_b_sampler = torch.utils.data.BatchSampler(val_sampler, args.batch_size, drop_last=True)
-    val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_sampler=val_b_sampler, collate_fn=CollateFunc(), num_workers=args.num_workers, pin_memory=True)
     
     train_transformer = Augmentation(is_train=True, image_size=args.image_size, transforms=args.data_augment)
     train_dataset = VOCDataset(is_train = False,
@@ -60,6 +58,7 @@ def train():
                  boxes_per_cell = args.boxes_per_cell,
                  confidence_threshold = args.confidence_threshold
                  ).to(device)
+    flops(model, args.image_size, device)
           
     criterion =  Loss(device = device,
                          anchor_size = args.anchor_size,

@@ -54,7 +54,7 @@ class Conv(nn.Module):
 class ConvBlocks(nn.Module):
     def __init__(self, in_dim, out_dim, act_type='silu', norm_type='BN', depthwise=False):
         super().__init__()
-        inter_dim = out_dim // 2
+        inter_dim = out_dim//2
         self.convs = nn.Sequential(
             Conv(in_dim, out_dim, k=1, act_type=act_type, norm_type=norm_type),
             Conv(out_dim, inter_dim, k=3, p=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise),
