@@ -45,21 +45,21 @@ class YOLO(nn.Module):
         self.neck = build_neck(neck, feat_dims[-1])
 
         # 特征金字塔
-        self.fpn, feat_dims = build_fpn(fpn, feat_dims)
+        self.fpn, feat_dims = build_fpn(backbone, fpn, feat_dims)
 
         self.heads = nn.ModuleList(
             [Decouple(dim) for dim in feat_dims]
         )
         
-        self.obj_pred = nn.ModuleList(
+        self.obj_preds = nn.ModuleList(
             [nn.Conv2d(dim, 1*self.boxes_per_cell, kernel_size=1) for dim in feat_dims]
         )
         
-        self.cls_pred = nn.ModuleList(
+        self.cls_preds = nn.ModuleList(
             [nn.Conv2d(dim, self.num_classes*self.boxes_per_cell, kernel_size=1) for dim in feat_dims]
         )
         
-        self.reg_pred = nn.ModuleList(
+        self.reg_preds = nn.ModuleList(
             [nn.Conv2d(dim, 4*self.boxes_per_cell, kernel_size=1) for dim in feat_dims]
         )
 
@@ -235,9 +235,9 @@ class YOLO(nn.Module):
         for level, (feat, head) in enumerate(zip(pyramid_feats, self.heads)):
             cls_feat, reg_feat = head(feat)
 
-            obj_pred = self.obj_pred[level](reg_feat)
-            cls_pred = self.cls_pred[level](cls_feat)
-            reg_pred = self.reg_pred[level](reg_feat)
+            obj_pred = self.obj_preds[level](reg_feat)
+            cls_pred = self.cls_preds[level](cls_feat)
+            reg_pred = self.reg_preds[level](reg_feat)
 
             # anchors: [M, 2]
             fmp_size = obj_pred.shape[-2:]
@@ -298,9 +298,9 @@ class YOLO(nn.Module):
             for level, (feat, head) in enumerate(zip(pyramid_feats, self.heads)):
                 cls_feat, reg_feat = head(feat)
 
-                obj_pred = self.obj_pred[level](reg_feat)
-                cls_pred = self.cls_pred[level](cls_feat)
-                reg_pred = self.reg_pred[level](reg_feat)
+                obj_pred = self.obj_preds[level](reg_feat)
+                cls_pred = self.cls_preds[level](cls_feat)
+                reg_pred = self.reg_preds[level](reg_feat)
 
                 fmp_size = obj_pred.shape[-2:]
 

@@ -3,9 +3,10 @@ import time
 import torch
 import numpy
 from eval import Evaluator
-from model.yolo import YOLO
+from model.build import build_yolo
 from config import parse_args
 from metric.flops import flops
+from utils.optimizer import build_optimizer
 from metric.criterion import Loss
 from dataset.voc import VOCDataset
 from dataset.utils import CollateFunc
@@ -47,17 +48,7 @@ def train():
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_sampler=train_b_sampler, collate_fn=CollateFunc(), num_workers=args.num_workers, pin_memory=True)
 
     # ----------------------- Build Model ----------------------------------------
-    model = YOLO(device = device,
-                 trainable = True,
-                 backbone = args.backbone,
-                 neck = args.neck,
-                 fpn = args.fpn,
-                 anchor_size = args.anchor_size,
-                 num_classes = args.num_classes,
-                 nms_threshold = args.nms_threshold,
-                 boxes_per_cell = args.boxes_per_cell,
-                 confidence_threshold = args.confidence_threshold
-                 ).to(device)
+    model = build_yolo(args, device, True)
     flops(model, args.image_size, device)
           
     criterion =  Loss(device = device,
@@ -78,18 +69,13 @@ def train():
     
     grad_accumulate = max(1, round(64 / args.batch_size))
     learning_rate = (grad_accumulate*args.batch_size/64)*args.learning_rate
+    
+    start_epoch = 0
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+    # build_optimizer(1, model, args.resume_weight_path)
+    
     
     max_mAP = 0
-    start_epoch = 0
-    if args.resume_weight_path != "None":
-        ckt_pth = os.path.join('log', args.resume_weight_path)
-        checkpoint = torch.load(ckt_pth, map_location='cpu', weights_only=False)
-        max_mAP = checkpoint['mAP']
-        start_epoch = checkpoint['epoch'] + 1         
-        model.load_state_dict(checkpoint["model"])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-
     # ----------------------- Build Train ----------------------------------------
     start = time.time()
     for epoch in range(start_epoch, args.epochs_total):
