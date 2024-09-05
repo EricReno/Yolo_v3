@@ -13,9 +13,7 @@ from torch.utils.tensorboard import SummaryWriter
 from utils.flops import flops
 from utils.criterion import Loss
 from utils.optimizer import build_optimizer
-
-
-
+from utils.lr_scheduler import build_lambda_lr_scheduler
 
 def train():
     parser, args = parse_args()
@@ -72,6 +70,11 @@ def train():
         visualization = args.eval_visualization)
     
     optimizer, start_epoch = build_optimizer(args, model)
+
+    lr_scheduler, lf = build_lambda_lr_scheduler(args, optimizer)
+    if args.resume_weight_path and args.resume_weight_path != 'None':
+        lr_scheduler.last_epoch = start_epoch - 1  # do not move
+        lr_scheduler.step()
     
     # ----------------------- Build Train ----------------------------------------
     max_mAP = 0
@@ -87,13 +90,8 @@ def train():
                 for j, x in enumerate(optimizer.param_groups):
                     x['lr'] = numpy.interp(epoch*len(train_dataloader)+iteration,
                                            [0, args.warmup_epochs*len(train_dataloader)],
-                                           [0.1 if j ==0 else 0.0,
-                                            x['initial_lr']])
-            elif epoch >= args.second_stage_epochs:
-                optimizer.param_groups[0]['lr'] = args.second_stage_lr
-            elif epoch >= args.third_stage_epochs:
-                optimizer.param_groups[0]['lr'] = args.third_stage_lr
-
+                                           [0.1 if j ==0 else 0.0, x['initial_lr'] * lf(epoch)])
+                   
             ## forward
             images = images.to(device)
             outputs = model(images)
@@ -118,6 +116,8 @@ def train():
                   epoch, args.epochs_total, iteration+1, len(train_dataloader), optimizer.param_groups[0]['lr'], losses, loss_obj, loss_cls, loss_box))
             train_loss += losses.item() * images.size(0)
         
+        lr_scheduler.step()
+
         train_loss /= len(train_dataloader.dataset)
         writer.add_scalar('Loss/Train', train_loss, epoch)
 
@@ -147,6 +147,6 @@ def train():
                         'args': args},
                         ckpt_path)
                 max_mAP = mAP
-
+        
 if __name__ == "__main__":
     train()

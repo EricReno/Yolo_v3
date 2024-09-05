@@ -114,6 +114,11 @@ def parse_args():
                         type=str,
                         help='Base learning rate.')
     
+    parser.add_argument('--lr_scheduler',             
+                        default='linear',
+                        type=str,
+                        help='Base learning rate.')
+    
     parser.add_argument('--grad_accumulate', 
                         default=1, type=int,
                         help='gradient accumulation')
