@@ -2,81 +2,53 @@ import os
 import time
 import torch
 import numpy
-from eval import Evaluator
-from model.build import build_yolo
-from config import parse_args
-from dataset.voc import VOCDataset
-from dataset.utils import CollateFunc
-from dataset.augment import Augmentation
 from torch.utils.tensorboard import SummaryWriter
 
-from utils.flops import flops
-from utils.criterion import Loss
+from config import parse_args
+from evaluate import build_eval
+from model.build import build_yolo
+from utils.flops import compute_flops
+from utils.criterion import build_loss
 from utils.optimizer import build_optimizer
 from utils.lr_scheduler import build_lambda_lr_scheduler
+from dataset.build import build_augment, build_dataset, build_dataloader
 
 def train():
-    parser, args = parse_args()
+    args = parse_args()
     writer = SummaryWriter('log')
-    print("Setting Arguments.. : ")
-    for action in parser._actions:
-        if action.dest != 'help':
-            print(f"{action.dest} = {getattr(args, action.dest)}")
+    print("Setting Arguments.. : ", args)
+    print("----------------------------------------------------------")
 
     if args.cuda and torch.cuda.is_available():
         device = torch.device('cuda')
     else:
         device = torch.device('cpu')
 
-    # ---------------------------- Build Datasets ----------------------------
-    val_transformer = Augmentation(is_train=False, image_size=args.image_size, transforms=args.data_augment)
-    val_dataset = VOCDataset(is_train = False,
-                             data_dir = args.data_root,
-                             transform = val_transformer,
-                             image_set = args.val_dataset,
-                             voc_classes = args.class_names,
-                             )
-    
-    train_transformer = Augmentation(is_train=True, image_size=args.image_size, transforms=args.data_augment)
-    train_dataset = VOCDataset(is_train = False,
-                               data_dir = args.data_root,
-                               transform = train_transformer,
-                               image_set = args.train_dataset,
-                               voc_classes = args.class_names,
-                               )
-    
-    train_sampler = torch.utils.data.RandomSampler(train_dataset)
-    train_b_sampler = torch.utils.data.BatchSampler(train_sampler, args.batch_size, drop_last=True)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_sampler=train_b_sampler, collate_fn=CollateFunc(), num_workers=args.num_workers, pin_memory=True)
+    # ---------------------------- Build --------------------------
+    val_transformer = build_augment(args, is_train=False)
+    train_transformer = build_augment(args, is_train=True)
 
-    # ----------------------- Build Model ----------------------------------------
+    val_dataset = build_dataset(args, False, val_transformer, args.val_dataset)
+    train_dataset = build_dataset(args, True, train_transformer, args.train_dataset)
+    train_dataloader = build_dataloader(args, train_dataset)
+
     model = build_yolo(args, device, True)
-    flops(model, args.image_size, device)
+    compute_flops(model, args.image_size, device)
           
-    criterion =  Loss(device = device,
-                         anchor_size = args.anchor_size,
-                         num_classes = args.num_classes,
-                         boxes_per_cell = args.boxes_per_cell,
-                         bbox_loss_weight = args.bbox_loss_weight,
-                         objectness_loss_weight = args.objectness_loss_weight,
-                         class_loss_weight = args.class_loss_weight)
+    criterion =  build_loss(args, device)
     
-    evaluator = Evaluator(
-        device   =device,
-        dataset  = val_dataset,
-        ovthresh = args.nms_threshold,                        
-        class_names = args.class_names,
-        recall_thre = args.recall_threshold,
-        visualization = args.eval_visualization)
+    evaluator = build_eval(args, val_dataset, device)
     
     optimizer, start_epoch = build_optimizer(args, model)
-
+    
     lr_scheduler, lf = build_lambda_lr_scheduler(args, optimizer)
+    lr_scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume_weight_path and args.resume_weight_path != 'None':
-        lr_scheduler.last_epoch = start_epoch - 1  # do not move
+        optimizer.step()
         lr_scheduler.step()
     
-    # ----------------------- Build Train ----------------------------------------
+    # ----------------------- Train --------------------------------
+    print('==============================')
     max_mAP = 0
     start = time.time()
     for epoch in range(start_epoch, args.epochs_total):
@@ -125,22 +97,17 @@ def train():
         # save_model
         if epoch >= args.save_checkpoint_epoch:
             model.trainable = False
-            model.nms_thresh = args.nms_threshold
-            model.conf_thresh = args.confidence_threshold
-
-            weight = '{}.pth'.format(epoch)
-            ckpt_path = os.path.join(os.getcwd(), 'log', weight)
+            ckpt_path = os.path.join(os.getcwd(), 'log', '{}.pth'.format(epoch))
             if not os.path.exists(os.path.dirname(ckpt_path)): 
                 os.makedirs(os.path.dirname(ckpt_path))
             
             with torch.no_grad():
                 mAP = evaluator.eval(model)
             writer.add_scalar('mAP', mAP, epoch)
-            print("Epoch [{}]".format('-'*100))
-            print("Epoch [{}:{}], mAP [{:.4f}]".format(epoch, args.epochs_total, mAP))
-            print("Epoch [{}]".format('-'*100))
+
             if mAP > max_mAP:
-                torch.save({'model': model.state_dict(),
+                torch.save({
+                        'model': model.state_dict(),
                         'optimizer': optimizer.state_dict(),
                         'mAP':mAP,
                         'epoch': epoch,

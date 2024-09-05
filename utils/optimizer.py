@@ -35,11 +35,12 @@ def build_optimizer(args, model, resume=None):
 
     start_epoch = 0
     if args.resume_weight_path and args.resume_weight_path != 'None':
-        checkpoint = torch.load(os.path.join('log', resume))
+        ckpt_path = os.path.join('log', args.resume_weight_path)
+        checkpoint = torch.load(ckpt_path, weights_only=False)
         # checkpoint state dict
         try:
             checkpoint_state_dict = checkpoint.pop("optimizer")
-            print('Load optimizer from the checkpoint: ', resume)
+            print('Load optimizer from the checkpoint: ', args.resume_weight_path)
             optimizer.load_state_dict(checkpoint_state_dict)
             start_epoch = checkpoint.pop("epoch") + 1
             del checkpoint, checkpoint_state_dict

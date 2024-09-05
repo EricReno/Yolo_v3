@@ -1,10 +1,12 @@
 # Yolo_V3 (You only look once)
 yolo_v3的pytorch源码，数据集为VOC20，包含训练、推理、验证、部署脚本
 
-- 传送门：
+- 论文传送门：
 
 https://arxiv.org/abs/1506.02640 (v1)
+
 https://arxiv.org/abs/1612.08242 (v2)
+
 https://arxiv.org/abs/1804.02767 (v3)
 
 ## 数据集: VOC 

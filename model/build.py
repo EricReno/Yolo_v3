@@ -4,6 +4,14 @@ import torch.nn as nn
 from .yolo import YOLO
 
 def build_yolo(args, device, trainable):
+    print('==============================')
+    print('Build Model ...')
+    print('Backbone: {}'.format(args.backbone))
+    print('Neck    : {}'.format(args.neck.upper()))
+    print('FPN     : {}'.format(args.fpn.upper()))
+    print('Head    : Decoupled Head')
+    print('')
+
     model = YOLO(device = device,
                 trainable = trainable,
                 backbone = args.backbone,
@@ -49,9 +57,10 @@ def build_yolo(args, device, trainable):
         checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=False)
         # checkpoint state dict
         try:
-            checkpoint_state_dict = checkpoint.pop("model")
+            checkpoint_state_dict = checkpoint['model']
             print('Load model from the checkpoint: ', ckpt_path)
-            model.load_state_dict(checkpoint_state_dict)
+            model.load_state_dict(checkpoint_state_dict, strict=False)
+            
             del checkpoint, checkpoint_state_dict
         except:
             print("No model in the given checkpoint.")

@@ -268,6 +268,17 @@ class Evaluator():
 
         return self.map
 
+def build_eval(args, dataset, device):
+    evaluator = Evaluator(
+        device   =device,
+        dataset  = dataset,
+        ovthresh = args.nms_threshold,                        
+        class_names = args.class_names,
+        recall_thre = args.recall_threshold,
+        visualization = args.eval_visualization)
+    
+    return evaluator
+    
 if __name__ == "__main__":
     parser, args = parse_args()
 

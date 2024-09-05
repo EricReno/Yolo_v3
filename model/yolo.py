@@ -45,7 +45,7 @@ class YOLO(nn.Module):
         self.neck = build_neck(neck, feat_dims[-1])
 
         # 特征金字塔
-        # self.fpn, feat_dims = build_fpn(fpn, feat_dims)
+        self.fpn, feat_dims = build_fpn(fpn, feat_dims)
 
         self.heads = nn.ModuleList(
             [Decouple(dim) for dim in feat_dims]
@@ -220,11 +220,11 @@ class YOLO(nn.Module):
 
     @torch.no_grad()
     def inference(self, x):
-        pyramid_feats = self.backbone(x) # [1, 3, 416, 416] --> [1, 256, 52, 52], [1, 512, 26, 26], [1, 1024, 13, 13]
+        pyramid_feats = self.backbone(x) 
 
         pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
-        # pyramid_feats = self.fpn(pyramid_feats) # --> [torch.Size([1, 128, 52, 52]), torch.Size([1, 256, 26, 26]), torch.Size([1, 512, 13, 13])]
+        pyramid_feats = self.fpn(pyramid_feats) 
 
         
         all_anchors = []
@@ -283,13 +283,11 @@ class YOLO(nn.Module):
         else:
             batch_size = x.shape[0]
 
-            # [1, 3, 416, 416] --> [[1, 256, 52, 52], [1, 512, 26, 26], [1, 1024, 13, 13]]
             pyramid_feats = self.backbone(x) 
 
             pyramid_feats[-1] = self.neck(pyramid_feats[-1])
 
-            # --> [torch.Size([1, 128, 52, 52]), torch.Size([1, 256, 26, 26]), torch.Size([1, 512, 13, 13])]
-            # pyramid_feats = self.fpn(pyramid_feats) 
+            pyramid_feats = self.fpn(pyramid_feats) 
 
             all_fmp_sizes = []
             all_obj_preds = []

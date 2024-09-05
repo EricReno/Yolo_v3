@@ -219,3 +219,13 @@ class Loss(object):
                 losses = losses
         )
     
+def build_loss(args, device):
+    loss =  Loss(device = device,
+                 anchor_size = args.anchor_size,
+                 num_classes = args.num_classes,
+                 boxes_per_cell = args.boxes_per_cell,
+                 bbox_loss_weight = args.bbox_loss_weight,
+                 objectness_loss_weight = args.objectness_loss_weight,
+                 class_loss_weight = args.class_loss_weight)
+    return loss
+    

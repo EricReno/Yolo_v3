@@ -9,7 +9,7 @@ def parse_args():
                         help='Enable CUDA for GPU acceleration.')   
 
     parser.add_argument('--num_workers',  
-                        default=16,
+                        default=4,
                         type=int,
                         help='Number of CPU threads to use during data loading.')             
     
@@ -79,7 +79,7 @@ def parse_args():
 
     # Training settings
     parser.add_argument('--batch_size',
-                        default=64,
+                        default=8,
                         type=int,
                         help='Batch size used during training (per GPU).')
     
@@ -118,11 +118,6 @@ def parse_args():
                         type=float,
                         help='Base learning rate.')
     
-    parser.add_argument('--warmup_learning_rate',
-                        default=0.00001,
-                        type=float,
-                        help='Learning rate during warm-up phase.')
-        
     parser.add_argument('--momentum',
                         default=0.9,
                         type=float,
@@ -172,7 +167,7 @@ def parse_args():
                         help='Path to the initial model weights.')
 
     parser.add_argument('--resume_weight_path',         
-                        default='None',                
+                        default='3.pth',                
                         type=str,
                         help='Path to the checkpoint from which to resume training.')
     
@@ -181,4 +176,4 @@ def parse_args():
                         type=bool,
                         help='')
 
-    return parser, parser.parse_args()
+    return parser.parse_args()
