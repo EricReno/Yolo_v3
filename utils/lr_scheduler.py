@@ -2,8 +2,8 @@
 import torch
 
 def build_lambda_lr_scheduler(args, optimizer):
-    epochs = args.max_epoch
-    scheduler = args.scheduler
+    epochs = args.epochs_total
+    scheduler = args.lr_scheduler
 
     lrf = 0.01
     if scheduler == 'linear':

@@ -90,7 +90,7 @@ def train():
                 for j, x in enumerate(optimizer.param_groups):
                     x['lr'] = numpy.interp(epoch*len(train_dataloader)+iteration,
                                            [0, args.warmup_epochs*len(train_dataloader)],
-                                           [0.1 if j ==0 else 0.0, x['initial_lr'] * lf(epoch)])
+                                           [0.1 if j == 0 else 0.0, x['initial_lr'] * lf(epoch)])
                    
             ## forward
             images = images.to(device)
@@ -113,7 +113,7 @@ def train():
 
             ## log
             print("Time [{}], Epoch [{}:{}/{}:{}], lr: {:.5f}, Loss: {:8.4f}, Loss_obj: {:8.4f}, Loss_cls: {:6.3f}, Loss_box: {:6.3f}".format(time.strftime('%H:%M:%S', time.gmtime(time.time()- start)), 
-                  epoch, args.epochs_total, iteration+1, len(train_dataloader), optimizer.param_groups[0]['lr'], losses, loss_obj, loss_cls, loss_box))
+                  epoch, args.epochs_total, iteration+1, len(train_dataloader), optimizer.param_groups[2]['lr'], losses, loss_obj, loss_cls, loss_box))
             train_loss += losses.item() * images.size(0)
         
         lr_scheduler.step()

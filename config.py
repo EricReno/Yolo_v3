@@ -89,20 +89,10 @@ def parse_args():
                         help='Total number of training epochs.')
     
     parser.add_argument('--warmup_epochs',
-                        default=1,
+                        default=3,
                         type=int,
                         help='Number of warm-up epochs.')
     
-    parser.add_argument('--second_stage_epochs',
-                        default=60,
-                        type=int,
-                        help='Number of epochs in the second stage of training.')
-    
-    parser.add_argument('--third_stage_epochs',
-                        default=90,
-                        type=int,
-                        help='Number of epochs in the third stage of training.')
-
     parser.add_argument('--save_checkpoint_epoch',
                         default=0,
                         type=int,
@@ -132,17 +122,7 @@ def parse_args():
                         default=0.00001,
                         type=float,
                         help='Learning rate during warm-up phase.')
-    
-    parser.add_argument('--second_stage_lr',
-                        default=0.001,
-                        type=float,
-                        help='Learning rate during the second stage of training.')
-    
-    parser.add_argument('--third_stage_lr',
-                        default=0.0001,
-                        type=float,
-                        help='Learning rate during the third stage of training.')
-    
+        
     parser.add_argument('--momentum',
                         default=0.9,
                         type=float,
