@@ -32,17 +32,17 @@ https://arxiv.org/abs/1804.02767 (v3)
 | :---: |:---:|  :---:  | :---:|   :---: |:---:  | :---:      | :---:    | :---:    | :---:    |:---:    |
 |512x512|  64 |   CoCo  |  160 |   1.0 | 1.0  | 5.0        | 0.5      |  0.3     | SGD| 0.01|
 
-|DataAugmentation|
-|   :---:     |
-|RandomSaturationHue|
-|RandomContrast|
-|RandomBrightness|
-|RandomSampleCrop|
-|RandomExpand|
+|DataAugmentation    | 
+|:---:               |
+|RandomSaturationHue |
+|RandomContrast      |
+|RandomBrightness    |
+|RandomSampleCrop    |
+|RandomExpand        |
 |RandomHorizontalFlip|
 
 ## Results:
-| TAG  |  Size|    mAP    |    GFLOPs     |Params |Pt_Size| FPS |
-| :---: |   :---:   | :---:   |  :---:  |:---:  |:---:  |:---:  |
-|v3_tiny|   512   |56.17%  |   5.18      | 2.43| 19M|75.44(1050Ti)|
-|v3_Darknet53|   512   |75.71%  |  133.40      | 57.43| 442M|10.32(1050Ti)|
+|TAG              |Size |mAP   |GFLOPs|Params|Pt_Size|FPS          |
+|:---:            |:---:|:---: |:---: |:---: |:---:  |:---:        |
+|Yolo_v3_tiny     |512  |56.17%|  4.56|  2.39|    19M|75.44(1050Ti)|
+|Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   442M|10.32(1050Ti)|
