@@ -1,10 +1,9 @@
 import os
 import torch
 import numpy as np
-from model.yolo import YOLO
 from config import parse_args
-from dataset.voc import VOCDataset
-from dataset.augment import Augmentation
+from model.build import build_yolo
+from dataset.build import build_augment, build_dataset
 
 def rescale_bboxes(bboxes, std_size, ratio):
     bboxes[..., [0, 2]] /= ratio[0]
@@ -66,6 +65,8 @@ class Evaluator():
         return ap
   
     def inference(self, model):
+        # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        # video = cv2.VideoWriter('result.mp4', fourcc, 1, (int(1000*0.8), int(415*0.8)))
         for i in range(len(self.dataset)):
             image, target, deltas = self.dataset[i]
 
@@ -126,8 +127,9 @@ class Evaluator():
                         cv2.rectangle(prediction_image, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), class_colors[labels[index]])
                         cv2.rectangle(prediction_image, (int(box[0]), int(box[1])),  (int(box[0]) + w, int(box[1]) + h), class_colors[labels[index]], -1) 
                         cv2.putText(prediction_image, text, (int(box[0]), int(box[1])+h), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
-                    cv2.rectangle(prediction_image, (0, 0),  (50, 20), (0,0,0), -1) 
-                    cv2.putText(prediction_image, 'DT', (5, 20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+                    text_image = np.zeros((40, prediction_image.shape[1], 3), dtype=np.uint8)
+                    cv2.putText(text_image, 'Detection', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+                    prediction_image = np.concatenate((prediction_image, text_image), axis=0)
 
                     # groundtruth
                     for index, box in enumerate(target['boxes']):
@@ -136,14 +138,19 @@ class Evaluator():
                         cv2.rectangle(groundtruth_image, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), class_colors[int(target['labels'][index])])
                         cv2.rectangle(groundtruth_image, (int(box[0]), int(box[1])),  (int(box[0]) + w, int(box[1]) + h), class_colors[int(target['labels'][index])], -1) 
                         cv2.putText(groundtruth_image, text, (int(box[0]), int(box[1])+h), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
-                    cv2.rectangle(groundtruth_image, (0, 0),  (50, 20), (0,0,0), -1) 
-                    cv2.putText(groundtruth_image, 'GT', (5, 20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+                    text_image = np.zeros((40, groundtruth_image.shape[1], 3), dtype=np.uint8)
+                    cv2.putText(text_image, 'GroundTruth', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+                    groundtruth_image = np.concatenate((groundtruth_image, text_image), axis=0)
 
                     show_image = np.concatenate((groundtruth_image, prediction_image), axis=1)
                     cv2.imshow('1', show_image)
                     cv2.waitKey(0)
+                    # show_image = cv2.resize(show_image, (int(1000*0.8), int(415*0.8)))   
+                    # video.write(show_image)
 
             print('Inference: {} / {}'.format(i+1, len(self.dataset)), end='\r')
+
+        # video.release()
         
     def load_gt(self, classname):
         npos = 0
@@ -280,50 +287,30 @@ def build_eval(args, dataset, device):
     return evaluator
     
 if __name__ == "__main__":
-    parser, args = parse_args()
-
+    args = parse_args()
+    args.resume_weight_path = "None"
     if args.cuda and torch.cuda.is_available():
         device = torch.device('cuda')
         print('use cuda')
     else:
         device = torch.device('cpu')
 
-    val_transformer = Augmentation(is_train=False, image_size=args.image_size, transforms=args.data_augment)
-    val_dataset = VOCDataset(is_train = False,
-                             data_dir = args.data_root,
-                             transform = val_transformer,
-                             image_set = args.val_dataset,
-                             voc_classes = args.class_names,
-                             )
 
-    model = YOLO(device = device,
-                 trainable = False,
-                 backbone = args.backbone,
-                 neck = args.neck,
-                 fpn = args.fpn,
-                 anchor_size = args.anchor_size,
-                 num_classes = args.num_classes,
-                 nms_threshold = args.nms_threshold,
-                 boxes_per_cell = args.boxes_per_cell,
-                 confidence_threshold = args.confidence_threshold
-                 ).eval().to(device)
+    val_transformer = build_augment(args, is_train=False)
+    val_dataset = build_dataset(args, False, val_transformer, args.val_dataset)
 
-    state_dict = torch.load(
-                            f = os.path.join('log', args.model_weight_path), 
+
+    model = build_yolo(args, device, False)
+    model = model.eval()
+
+
+    state_dict = torch.load(f = os.path.join('log', args.model_weight_path), 
                             map_location = 'cpu', 
                             weights_only = False)
-    print('mAP:', state_dict['mAP'])
-    
     model.load_state_dict(state_dict["model"])
+    print('mAP:', state_dict['mAP'])
 
-    
-    evaluator = Evaluator(
-        device   = device,
-        dataset  = val_dataset,
-        ovthresh = args.nms_threshold,                        
-        class_names = args.class_names,
-        recall_thre = args.recall_threshold,
-        visualization = args.eval_visualization)
 
     # VOC evaluation
+    evaluator = build_eval(args, val_dataset, device)
     map = evaluator.eval(model)

@@ -40,10 +40,10 @@ def train():
     evaluator = build_eval(args, val_dataset, device)
     
     optimizer, start_epoch = build_optimizer(args, model)
-    
+
     lr_scheduler, lf = build_lambda_lr_scheduler(args, optimizer)
-    lr_scheduler.last_epoch = start_epoch - 1  # do not move
     if args.resume_weight_path and args.resume_weight_path != 'None':
+        lr_scheduler.last_epoch = start_epoch - 1
         optimizer.step()
         lr_scheduler.step()
     
@@ -51,7 +51,7 @@ def train():
     print('==============================')
     max_mAP = 0
     start = time.time()
-    for epoch in range(start_epoch, args.epochs_total):
+    for epoch in range(start_epoch, args.epochs_total+1):
         model.train()
         train_loss = 0.0
         model.trainable = True
@@ -63,7 +63,7 @@ def train():
                     x['lr'] = numpy.interp(epoch*len(train_dataloader)+iteration,
                                            [0, args.warmup_epochs*len(train_dataloader)],
                                            [0.1 if j == 0 else 0.0, x['initial_lr'] * lf(epoch)])
-                   
+                  
             ## forward
             images = images.to(device)
             outputs = model(images)
@@ -87,7 +87,7 @@ def train():
             print("Time [{}], Epoch [{}:{}/{}:{}], lr: {:.5f}, Loss: {:8.4f}, Loss_obj: {:8.4f}, Loss_cls: {:6.3f}, Loss_box: {:6.3f}".format(time.strftime('%H:%M:%S', time.gmtime(time.time()- start)), 
                   epoch, args.epochs_total, iteration+1, len(train_dataloader), optimizer.param_groups[2]['lr'], losses, loss_obj, loss_cls, loss_box))
             train_loss += losses.item() * images.size(0)
-        
+
         lr_scheduler.step()
 
         train_loss /= len(train_dataloader.dataset)

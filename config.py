@@ -9,7 +9,7 @@ def parse_args():
                         help='Enable CUDA for GPU acceleration.')   
 
     parser.add_argument('--num_workers',  
-                        default=16,
+                        default=4,
                         type=int,
                         help='Number of CPU threads to use during data loading.')             
     
@@ -36,7 +36,7 @@ def parse_args():
 
     # Model settings
     parser.add_argument('--backbone', 
-                        default='darknet53',
+                        default='darknet_tiny',
                         type=str,
                         choices=['darknet53', 'darknet_tiny'],
                         help='Backbone network architecture.')
@@ -162,17 +162,17 @@ def parse_args():
     
     # Model checkpoint
     parser.add_argument('--model_weight_path',         
-                        default='None',                
+                        default='yolo_tiny.pth',                
                         type=str,
                         help='Path to the initial model weights.')
 
     parser.add_argument('--resume_weight_path',         
-                        default='None',                
+                        default='157.pth',                
                         type=str,
                         help='Path to the checkpoint from which to resume training.')
     
     parser.add_argument('--eval_visualization',         
-                        default=False,                
+                        default=True,                
                         type=bool,
                         help='')
 
