@@ -51,6 +51,7 @@ https://arxiv.org/abs/1804.02767 (v3)
 <tr><th>Yolo_v3_Tiny</th> <th>Yolo_v3_Darknet53</th></tr>
 <tr>
 <td>
+    
 |ClassNames |AP   |
 |--         |--   |
 |aeroplane  |0.681|
@@ -74,11 +75,14 @@ https://arxiv.org/abs/1804.02767 (v3)
 |train      |0.753|
 |tvmonitor  |0.677|
 |mAP        |0.657|
+
 </td>
 <td>
+    
 |ClassNames |AP   |
 |--         |--   |
 |           |     |
+
 </td>
 </tr> 
 </table>
