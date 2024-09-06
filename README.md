@@ -11,8 +11,9 @@ https://arxiv.org/abs/1804.02767 (v3)
 ## 数据集: VOC 
 - **test**: (VOC2007, test) : 4952
 - **train**: (VOC2007, trainval), (VOC2012, trainval) : 16553
-- **CLASSES_NAMES**: 
+- **CLASSES_NAMES**:
 
+|             |          |         |           |           |
 | :---------: | :------: | :-----: | :-------: | :-------: |
 |  aeroplane  | bicycle  |  bird   |   boat    | bottle    |
 |     bus     |   car    |  cat    |  chair    | cow       |
@@ -45,14 +46,6 @@ https://arxiv.org/abs/1804.02767 (v3)
 |:---:            |:---:|:---: |:---: |:---: |:---:  |:---:   |
 |Yolo_v3_Tiny     |512  |65.71%|  4.56|  2.39|  18.4M||
 |Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   442M||
-
-~~~~~~~~
-Results:
-
-
-~~~~~~~~
-Mean AP = 65.7138%
-~~~~~~~~
 
 <table>
 <tr><th>Yolo_v3_Tiny</th> <th>Yolo_v3_Darknet53</th></tr>
