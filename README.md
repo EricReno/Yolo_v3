@@ -44,8 +44,8 @@ https://arxiv.org/abs/1804.02767 (v3)
 ## Results:
 |TAG              |Size |mAP   |GFLOPs|Params|Pt_Size|FPS-3060|
 |:---:            |:---:|:---: |:---: |:---: |:---:  |:---:   |
-|Yolo_v3_Tiny     |512  |65.71%|  4.56|  2.39|  18.4M||
-|Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   442M||
+|Yolo_v3_Tiny     |512  |65.71%|  4.56|  2.39|  18.4M| 77.1141|
+|Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   442M|  5.0489|
 
 <table>
 <tr><th>Yolo_v3_Tiny</th> <th>Yolo_v3_Darknet53</th></tr>
@@ -82,7 +82,35 @@ https://arxiv.org/abs/1804.02767 (v3)
 |ClassNames |AP   |
 |--         |--   |
 |           |     |
+|aeroplane  |0.745|
+|bicycle    |0.795|
+|bird       |0.780|
+|boat       |0.683|
+|bottle     |0.473|
+|bus        |0.872|
+|car        |0.797|
+|cat        |0.881|
+|chair      |0.609|
+|cow        |0.824|
+|diningtable|0.749|
+|dog        |0.874|
+|horse      |0.855|
+|motorbike  |0.790|
+|person     |0.688|
+|pottedplant|0.433|
+|sheep      |0.676|
+|sofa       |0.862|
+|train      |0.832|
+|tvmonitor  |0.742|
+|mAP        |0.748|
 
 </td>
 </tr> 
 </table>
+
+<video src="https://github.com/user-attachments/assets/d5811825-8c58-4f0f-9067-a79d0c9966dc" 
+       controls 
+       width="100%" 
+       height="auto" 
+       style="max-width: 720px; height: auto; display: block; object-fit: contain;">
+</video>

@@ -31,12 +31,11 @@ def parse_args():
     # Data augmentation
     parser.add_argument('--data_augment',
                         default=['RandomSaturationHue', 'RandomContrast', 'RandomBrightness', 'RandomSampleCrop', 'RandomExpand', 'RandomHorizontalFlip'],
-                        choices = ['RandomSaturationHue', 'RandomContrast', 'RandomBrightness', 'RandomSampleCrop', 'RandomExpand', 'RandomHorizontalFlip'],
                         help='List of data augmentation techniques applied during training.')
 
     # Model settings
     parser.add_argument('--backbone', 
-                        default='darknet_tiny',
+                        default='darknet53',
                         type=str,
                         choices=['darknet53', 'darknet_tiny'],
                         help='Backbone network architecture.')
@@ -44,12 +43,12 @@ def parse_args():
                         default='sppf',
                         type=str,
                         choices=['sppf'],
-                        help='Backbone network architecture.')
+                        help='Neck network architecture.')
     parser.add_argument('--fpn', 
                         default='fpn',
                         type=str,
                         choices=['fpn'],
-                        help='Backbone network architecture.')
+                        help='Feature Pyramid Network (FPN) architecture.')
     
     parser.add_argument('--image_size',
                         default=512,
@@ -64,6 +63,7 @@ def parse_args():
     parser.add_argument('--class_names',
                         default=['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 
                                  'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor'],          
+                        type=str,
                         help='List of class names.')
 
     parser.add_argument('--anchor_size', 
@@ -162,7 +162,7 @@ def parse_args():
     
     # Model checkpoint
     parser.add_argument('--model_weight_path',         
-                        default='yolo_tiny.pth',                
+                        default='yolo_darknet_53.pth',                
                         type=str,
                         help='Path to the initial model weights.')
 
@@ -172,8 +172,8 @@ def parse_args():
                         help='Path to the checkpoint from which to resume training.')
     
     parser.add_argument('--eval_visualization',         
-                        default=True,                
+                        default=False,                
                         type=bool,
-                        help='')
+                        help='Whether to visualize the evaluation results.')
 
     return parser.parse_args()
