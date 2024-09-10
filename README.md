@@ -42,10 +42,10 @@ https://arxiv.org/abs/1804.02767 (v3)
 |  64 |CoCo      |160  |1.0     | 1.0    | 5.0    |0.5   |0.3       |SGD  |0.01        |linear      |
 
 ## Results:
-|TAG              |Size |mAP   |GFLOPs|Params|Pt_Size|FPS-3060|
-|:---:            |:---:|:---: |:---: |:---: |:---:  |:---:   |
-|Yolo_v3_Tiny     |512  |65.71%|  4.56|  2.39|  18.4M| 77.1141|
-|Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   442M|  5.0489|
+|TAG              |Size |mAP   |GFLOPs|Params|Memory-8|Pt_Size|FPS-3060|
+|:---:            |:---:|:---: |:---: |:---: |:---:   |:---:  |:---:   |
+|Yolo_v3_Tiny     |512  |65.71%|  4.56|  2.39|   1415M|  18.4M| 77.1141|
+|Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   6981M|   442M|  5.0489|
 
 <table>
 <tr><th>Yolo_v3_Tiny</th> <th>Yolo_v3_Darknet53</th></tr>
