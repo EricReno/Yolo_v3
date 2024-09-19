@@ -111,7 +111,7 @@ class YOLO(nn.Module):
             将txtytwth转换为常用的x1y1x2y2形式。
         """
         # 计算预测边界框的中心点坐标和宽高
-        pred_ctr = (torch.sigmoid(reg_pred[..., :2]) + anchors[..., :2]) * self.stride[level]
+        pred_ctr = (torch.sigmoid(reg_pred[..., :2])*2.0 - 0.5 + anchors[..., :2]) * self.stride[level]
         pred_wh = torch.exp(reg_pred[..., 2:]) * anchors[..., 2:]
 
         # 将所有bbox的中心带你坐标和宽高换算成x1y1x2y2形式
@@ -124,11 +124,6 @@ class YOLO(nn.Module):
     ## basic NMS
     def nms(self, bboxes, scores, nms_thresh):
         """"Pure Python NMS."""
-        # 将所有bbox的中心带你坐标和宽高换算成x1y1x2y2形式
-        pred_x1y1 = bboxes[..., :2] - bboxes[..., 2:] * 0.5
-        pred_x2y2 = bboxes[..., :2] + bboxes[..., 2:] * 0.5
-        bboxes = np.concatenate([pred_x1y1, pred_x2y2], axis=-1)
-
         x1 = bboxes[:, 0]  #xmin
         y1 = bboxes[:, 1]  #ymin
         x2 = bboxes[:, 2]  #xmax

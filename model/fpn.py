@@ -13,15 +13,15 @@ class FPN(nn.Module):
         self.top_down_layer_1 = ConvBlocks(c5, int(0.5*c5))
 
         # P5 -> P4
-        self.reduce_layer_1 = Conv(int(0.5*c5), int(0.25*c5), k=1)
+        self.reduce_layer_1 = Conv(int(0.5*c5), int(0.25*c5), k=1, act_type='silu', norm_type='BN')
         self.top_down_layer_2 = ConvBlocks(c4+int(0.25*c5), int(0.5*c4))
 
         # P4 -> P3
-        self.reduce_layer_2 = Conv(int(0.5*c4), int(0.25*c4), k=1)
+        self.reduce_layer_2 = Conv(int(0.5*c4), int(0.25*c4), k=1, act_type='silu', norm_type='BN')
         self.top_down_layer_3 = ConvBlocks(c3+int(0.25*c4), int(0.5*c3))
 
         self.out_layers = nn.ModuleList([
-                Conv(int(0.5*in_dim), out_dim, k=3) for in_dim in feat_dims])
+                Conv(int(0.5*in_dim), out_dim, k=3, act_type='silu', norm_type='BN') for in_dim in feat_dims])
         self.out_dim = [out_dim] * 3
     
     def forward(self, features):

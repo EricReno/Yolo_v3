@@ -77,15 +77,6 @@ class DarkNet53(nn.Module):
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(1024, 1000)
-
-        # for m in self.modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         nn.init.xavier_uniform_(m.weight)
-        #         if m.bias is not None:
-        #             nn.init.constant_(m.bias, 0)
-        #     elif isinstance(m, nn.BatchNorm2d):
-        #         nn.init.constant_(m.weight, 1)
-        #         nn.init.constant_(m.bias, 0)
     
     def forward(self, x):
         c1 = self.layer_1(x)
@@ -142,8 +133,8 @@ class DarkNetTiny(nn.Module):
 
 
 model_urls = {
-    "darknet_tiny": "https://github.com/EricReno/ImageClassification/releases/download/weight/darknet_tiny.pth",
-    "darknet53": "https://github.com/EricReno/ImageClassification/releases/download/weight/darknet53.pth",
+    "darknet_tiny": "https://github.com/EricReno/Yolo_v3/releases/download/weight/darknet_tiny.pth",
+    "darknet53": "https://github.com/EricReno/Yolo_v3/releases/download/weight/darknet53.pth",
 }
 
 def build_backbone(model_name, pretrained):
@@ -203,4 +194,3 @@ if __name__ == "__main__":
     print('==============================')
     print('GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
     print('Params : {:.2f} M'.format(params / 1e6))
-
