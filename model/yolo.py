@@ -12,7 +12,7 @@ from config import parse_args
 from model.head import Decouple
 from model.neck import build_neck
 from model.fpn import build_fpn
-from model.backbone.darknet import build_backbone
+from model.darknet import build_backbone
 
 class YOLO(nn.Module):
     def __init__(self, 
