@@ -1,19 +1,21 @@
 import os
+import sys
 import cv2
 import time
 import numpy
 import argparse
 import onnxruntime
+sys.path.append('../')
 
 fps = []
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Inference VOC20')
     parser.add_argument('--cuda', default=True, help='Use CUDA for inference.')
-    parser.add_argument('--onnx', default='yolo_darknet_tiny.onnx', help='Path to the ONNX model file.')
+    parser.add_argument('--onnx', default='yolov3_tiny.onnx', help='Path to the ONNX model file.')
     parser.add_argument('--image_size', default=512, type=int, help='Input image size.')
     parser.add_argument('--confidence', default=0.3, type=float, help='Confidence threshold for object detection.')
-    parser.add_argument('--nms_thresh', default=0.5, type=float, help='NMS threshold.')
+    parser.add_argument('--nms_thresh', default=0.7, type=float, help='NMS threshold.')
     parser.add_argument('--class_names', nargs='+', default=['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 
                                                              'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 
                                                              'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 
@@ -23,7 +25,7 @@ def parse_args():
 def setup_inference(args):
     providers = [('CUDAExecutionProvider', {'device_id': 0})] if args.cuda else [('CPUExecutionProvider', {})]
     print('Using CUDA' if args.cuda else 'Using CPU')
-    return onnxruntime.InferenceSession(args.onnx, providers=providers)
+    return onnxruntime.InferenceSession(os.path.join(os.getcwd().replace('deploy', 'log'), args.onnx), providers=providers)
 
 def generate_colors(num_classes):
     numpy.random.seed(0)
@@ -154,7 +156,7 @@ def main():
         draw_bboxes(image, bboxes, labels, scores, args.class_names, class_colors)
 
         cv2.imshow('image', image)
-        if cv2.waitKey(1) == ord('q'):
+        if cv2.waitKey(0) == ord('q'):
             break
 
     cap.release()
