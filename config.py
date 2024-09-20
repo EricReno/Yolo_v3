@@ -35,7 +35,7 @@ def parse_args():
 
     # Model settings
     parser.add_argument('--backbone', 
-                        default='darknet53',
+                        default='darknet_tiny',
                         type=str,
                         choices=['darknet53', 'darknet_tiny'],
                         help='Backbone network architecture.')
@@ -79,7 +79,7 @@ def parse_args():
 
     # Training settings
     parser.add_argument('--batch_size',
-                        default=8,
+                        default=64,
                         type=int,
                         help='Batch size used during training (per GPU).')
     
@@ -146,7 +146,7 @@ def parse_args():
     
     # Thresholds
     parser.add_argument('--nms_threshold',
-                        default=0.7,
+                        default=0.5,
                         type=float,
                         help='Threshold for non-maximum suppression (NMS).')
 
@@ -156,7 +156,7 @@ def parse_args():
                         help='Threshold for gt and dets.')
     
     parser.add_argument('--confidence_threshold',
-                        default=0.001,
+                        default=0.3,
                         type=float,
                         help='Confidence threshold for filtering detections.')
     

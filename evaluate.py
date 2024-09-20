@@ -168,7 +168,7 @@ class Evaluator():
             for k in range(dets.shape[0]):
                 image_ids.append(image_id)
                 confidence.append(dets[k, -1])
-                bboxes.append([dets[k, 0]+1, dets[k, 1]+1, dets[k, 2]+1, dets[k, 3]]+1)
+                bboxes.append([dets[k, 0]+1, dets[k, 1]+1, dets[k, 2]+1, dets[k, 3]+1])
        
         return {
             'image_ids': np.array(image_ids),
