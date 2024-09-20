@@ -146,7 +146,7 @@ def parse_args():
     
     # Thresholds
     parser.add_argument('--nms_threshold',
-                        default=0.5,
+                        default=0.7,
                         type=float,
                         help='Threshold for non-maximum suppression (NMS).')
 
@@ -156,14 +156,9 @@ def parse_args():
                         help='Threshold for gt and dets.')
     
     parser.add_argument('--confidence_threshold',
-                        default=0.3,
+                        default=0.001,
                         type=float,
                         help='Confidence threshold for filtering detections.')
-    
-    parser.add_argument('--recall_threshold',
-                        default=101,
-                        type=int,
-                        help='Threshold for recall evaluation.')
     
     # Model checkpoint
     parser.add_argument('--model_weight_path',         

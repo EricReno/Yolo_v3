@@ -172,7 +172,12 @@ class YOLO(nn.Module):
             # [M, C] -> [MC,]
             scores_i = (torch.sqrt(obj_pred_i.sigmoid() * cls_pred_i.sigmoid())).flatten()
 
+            # Keep top k top scoring indices only.
+            num_topk = min(1000, box_pred_i.size(0))
+
             topk_scores, topk_idxs = scores_i.sort(descending=True)
+            topk_scores = topk_scores[:num_topk]
+            topk_idxs = topk_idxs[:num_topk]
 
             keep_idxs = topk_scores > self.confidence_threshold
             scores = topk_scores[keep_idxs]
