@@ -37,15 +37,15 @@ https://arxiv.org/abs/1804.02767 (v3)
 |RandomExpand        |
 |RandomHorizontalFlip|
 
-|BS   |Pretrained|Epoch|Obj_loss|Cls_loss|Box_loss|NMS_th|Confidence|APT  |LearningRate|Lr_scheduler|
-|:---:|:---:     |:---:|:---:   |:---:   |:---:   |:---: |:---:     |:---:|:---:       |:---:       |
-|  64 |CoCo      |160  |1.0     | 1.0    | 5.0    |0.5   |0.3       |SGD  |0.01        |linear      |
+|BS   |Pretrained|Epoch|NMS_TH.|Confidence_TH.|Optimizer|LearningRate|LrSheduler|
+|:---:|:---:     |:---:|:---: |:---:          |:---:    |:---:       |:---:     |
+|  64 |CoCo      |160  |0.5   |0.001          |SGD      |0.01        |linear    |
 
 ## Results:
-|TAG              |Size |mAP   |GFLOPs|Params|Memory-8|Pt_Size|FPS-3060|
-|:---:            |:---:|:---: |:---: |:---: |:---:   |:---:  |:---:   |
-|Yolo_v3_Tiny     |512  |65.71%|  4.56|  2.39|   1415M|  18.4M| 77.1141|
-|Yolo_v3_Darknet53|512  |75.71%|133.40| 57.43|   6981M|   442M|  5.0489|
+|TAG              |Size |mAP   |GFLOPs|Params |*.pt |FPS-3060|
+|:---:            |:---:|:---: |:---: |:---:  |:---:|:---:   |
+|Yolo_v3_Tiny     |512  |69.52%|  4.56|  2.39M|19.3M| 75.1001|
+|Yolo_v3_Darknet53|512  |78.68%|108.62| 56.89M| 442M|  5.0489|
 
 <table>
 <tr><th>Yolo_v3_Tiny</th> <th>Yolo_v3_Darknet53</th></tr>
@@ -54,55 +54,54 @@ https://arxiv.org/abs/1804.02767 (v3)
     
 |ClassNames |AP   |
 |--         |--   |
-|aeroplane  |0.681|
-|bicycle    |0.706|
-|bird       |0.671|
-|boat       |0.605|
-|bottle     |0.370|
-|bus        |0.755|
-|car        |0.758|
-|cat        |0.771|
-|chair      |0.482|
-|cow        |0.699|
-|diningtable|0.637|
-|dog        |0.729|
-|horse      |0.766|
-|motorbike  |0.740|
-|person     |0.642|
-|pottedplant|0.328|
-|sheep      |0.602|
-|sofa       |0.771|
-|train      |0.753|
-|tvmonitor  |0.677|
-|mAP        |0.657|
+|aeroplane  |0.752|
+|bicycle    |0.783|
+|bird       |0.700|
+|boat       |0.601|
+|bottle     |0.514|
+|bus        |0.782|
+|car        |0.799|
+|cat        |0.808|
+|chair      |0.525|
+|cow        |0.756|
+|diningtable|0.610|
+|dog        |0.742|
+|horse      |0.801|
+|motorbike  |0.766|
+|person     |0.753|
+|pottedplant|0.426|
+|sheep      |0.686|
+|sofa       |0.654|
+|train      |0.782|
+|tvmonitor  |0.662|
+|mAP        |0.695|
 
 </td>
 <td>
     
 |ClassNames |AP   |
 |--         |--   |
-|           |     |
-|aeroplane  |0.745|
-|bicycle    |0.795|
-|bird       |0.780|
-|boat       |0.683|
-|bottle     |0.473|
-|bus        |0.872|
-|car        |0.797|
-|cat        |0.881|
-|chair      |0.609|
-|cow        |0.824|
-|diningtable|0.749|
-|dog        |0.874|
-|horse      |0.855|
-|motorbike  |0.790|
-|person     |0.688|
-|pottedplant|0.433|
-|sheep      |0.676|
-|sofa       |0.862|
-|train      |0.832|
-|tvmonitor  |0.742|
-|mAP        |0.748|
+|aeroplane  |0.815|
+|bicycle    |0.855|
+|bird       |0.827|
+|boat       |0.698|
+|bottle     |0.640|
+|bus        |0.864|
+|car        |0.855|
+|cat        |0.875|
+|chair      |0.639|
+|cow        |0.872|
+|diningtable|0.699|
+|dog        |0.858|
+|horse      |0.874|
+|motorbike  |0.852|
+|person     |0.809|
+|pottedplant|0.535|
+|sheep      |0.790|
+|sofa       |0.736|
+|train      |0.858|
+|tvmonitor  |0.781|
+|mAP        |0.787|
 
 </td>
 </tr> 
