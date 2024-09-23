@@ -133,8 +133,8 @@ class DarkNetTiny(nn.Module):
 
 
 model_urls = {
-    "darknet_tiny": "https://github.com/EricReno/Yolo_v3/releases/download/weight/darknet_tiny.pth",
-    "darknet53": "https://github.com/EricReno/Yolo_v3/releases/download/weight/darknet_53.pth",
+    "darknet_tiny": "https://github.com/EricReno/Yolo_v3/releases/download/weights/darknet_tiny.pth",
+    "darknet53": "https://github.com/EricReno/Yolo_v3/releases/download/weights/darknet_53.pth",
 }
 
 def build_backbone(model_name, pretrained):
